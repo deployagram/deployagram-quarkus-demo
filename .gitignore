@@ -44,3 +44,6 @@ nb-configuration.xml
 # TLS Certificates
 .certs/
 
+### Deployagram ###
+.deployagram
+.env

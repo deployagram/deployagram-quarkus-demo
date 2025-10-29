@@ -1,6 +1,9 @@
 package com.deployagram.demo.quarkus;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.deployagram.annotations.junit5.Deployagram;
+import com.github.deployagram.annotations.junit5.DeployagramConfig;
+import com.github.deployagram.annotations.junit5.DeployagramConfigEntry;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import io.quarkiverse.wiremock.devservice.ConnectWireMock;
 import io.quarkus.test.common.QuarkusTestResource;
@@ -26,7 +29,20 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @QuarkusTest
 @QuarkusTestResource(KafkaCompanionResource.class)
 @ConnectWireMock
+@Deployagram(startEnvironment = true, shareHostPorts = {BookOverflowResourceTest.QUARKUS_APP_PORT, BookOverflowResourceTest.WIREMOCK_PORT}, proxyPort = BookOverflowResourceTest.PROXY_PORT)
+@DeployagramConfig({
+        @DeployagramConfigEntry(key = "proxy.namesOfSourceApps.BookOverflow/suggestion", value = "AppA"),
+        @DeployagramConfigEntry(key = "proxy.proxiedAppNames.BookOverflow/suggestion", value = "BookOverflow"),
+        @DeployagramConfigEntry(key = "proxy.proxiedApps.BookOverflow/suggestion", value = "http://host.testcontainers.internal:" + BookOverflowResourceTest.QUARKUS_APP_PORT + "/BookOverflow/suggestion"),
+        @DeployagramConfigEntry(key = "proxy.namesOfSourceApps.ClassicBooks/random", value = "BookOverflow"),
+        @DeployagramConfigEntry(key = "proxy.proxiedAppNames.ClassicBooks/random", value = "ClassicBooks"),
+        @DeployagramConfigEntry(key = "proxy.proxiedApps.ClassicBooks/random", value = "http://host.testcontainers.internal:" + BookOverflowResourceTest.WIREMOCK_PORT + "/ClassicBooks/random"),
+})
 class BookOverflowResourceTest {
+
+    protected static final int QUARKUS_APP_PORT = 8081;
+    protected static final int WIREMOCK_PORT = 9050;
+    protected static final int PROXY_PORT = 9080;
 
     private static final String EMAIL_ADDRESS = "test@deployagram.com";
 
@@ -56,6 +72,7 @@ class BookOverflowResourceTest {
                         .withBody(expectedRecommendation)));
 
         String body = given()
+                .port(PROXY_PORT)
                 .queryParam("email", EMAIL_ADDRESS)
                 .when().get("/BookOverflow/suggestion")
                 .then()

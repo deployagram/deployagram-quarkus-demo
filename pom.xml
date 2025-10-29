@@ -101,6 +101,12 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>com.deployagram</groupId>
+            <artifactId>deployagram-annotations-junit5</artifactId>
+            <version>1.0.3</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

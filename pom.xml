@@ -110,7 +110,7 @@
         <dependency>
             <groupId>com.deployagram</groupId>
             <artifactId>deployagram-kafka-interceptors</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
